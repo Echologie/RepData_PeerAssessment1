@@ -61,6 +61,13 @@ g + scale_x_continuous(name = "hour", breaks = c(0, 6, 12, 18, 24))
 
 ```
 
+We can observe which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps.
+
+```{r}
+intervalsActivity$interval[
+ intervalsActivity$steps == max(intervalsActivity$steps)]
+```
+
 
 ## Imputing missing values
 

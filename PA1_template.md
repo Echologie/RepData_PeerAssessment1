@@ -80,6 +80,18 @@ g + scale_x_continuous(name = "hour", breaks = c(0, 6, 12, 18, 24))
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
+We can observe which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps.
+
+
+```r
+intervalsActivity$interval[
+ intervalsActivity$steps == max(intervalsActivity$steps)]
+```
+
+```
+## [1] 08:35:00
+```
+
 
 ## Imputing missing values
 
@@ -135,7 +147,7 @@ dailyFilledActivity <- data.frame(
 qplot(steps, data = dailyFilledActivity)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
 ```r
 mean(dailyFilledActivity$steps)
@@ -199,4 +211,4 @@ for (i in 1:numPlots) {
 multiplot(g1,g2)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
