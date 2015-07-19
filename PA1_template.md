@@ -1,33 +1,37 @@
----
-title: "Activity"
-author: "Echologie"
-date: "Saturday, July 18, 2015"
-output: html_document
----
-#Loading the activity database
+# Reproducible Research: Peer Assessment 1
 
-```{r}
+## Loading and preprocessing the data
+
+
+```r
 con <- unz(description = "activity.zip", filename = "activity.csv")
 activity <- read.csv(
   file = con,
   colClasses = c("integer", "Date", "integer"))
 library(stringi)
 library(chron)
+```
+
+```
+## Warning: package 'chron' was built under R version 3.2.1
+```
+
+```r
 int2time <- function(x)
   {h <- x %/% 100
    m <- x %%  100
    times(h %s+% ":" %s+% m %s+% ":0", format = "h:m:s")}
 activity$interval <- int2time(activity$interval)
-
 ```
 
 
-#Average daily activity
+## What is mean total number of steps taken per day?
 
-We can see here the distribution of the total of steps made each day,
+We can see here the distribution of the total number of steps made each day,
 ignoring any missing values in the dataset.
 
-```{r}
+
+```r
 dailyActivity <- data.frame(
   date  = unique(activity$date),
   steps = tapply(activity$steps, activity$date, sum, na.rm=TRUE))
@@ -36,20 +40,35 @@ library(ggplot2)
 qplot(steps, data = dailyActivity)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
 And here are the average and median of this distribution
 
-```{r}
+
+```r
 mean(dailyActivity$steps)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(dailyActivity$steps)
 ```
 
-#Average daily activity pattern
+```
+## [1] 10395
+```
+
+## What is the average daily activity pattern?
 
 We now consider the average number of steps by interval across all days,
 always ignoring missing values.
 Here is the distribution obtained.
 
-```{r}
+
+```r
 intervalsActivity <- data.frame(
   interval = unique(activity$interval),
   steps    = tapply(activity$steps, activity$interval, mean, na.rm=TRUE))
@@ -57,37 +76,54 @@ intervalsActivity <- data.frame(
 g <- ggplot(intervalsActivity, aes(x = 24*interval, y = steps))
 g <- g + geom_line()
 g + scale_x_continuous(name = "hour", breaks = c(0, 6, 12, 18, 24))
-
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
 
-#Filling the blanks
+
+## Imputing missing values
 
 The total number of missing values is in fact very sensible :
 
-```{r}
+
+```r
 s <- sum(is.na(activity$steps))
 s
 ```
 
+```
+## [1] 2304
+```
+
 Over a total of :
 
-```{r}
+
+```r
 l <- length(activity$date)
 l
 ```
 
+```
+## [1] 17568
+```
+
 Which represent a proportion of :
 
-```{r}
+
+```r
 s/l
+```
+
+```
+## [1] 0.1311475
 ```
 
 Having missing values may underestimate the actual activity,
 by replacing those with the average number of steps walked in each specific interval, as found in the preceding part, we hope to correct this effect.
 We show here what we would have obtained in the first part (Average daily activity) with this procedure.
 
-```{r}
+
+```r
 filledActivity <- activity
 filledActivity$mean <- intervalsActivity$steps
 filledActivity$steps[is.na(filledActivity$steps)] <- filledActivity$mean[is.na(filledActivity$steps)]
@@ -97,17 +133,33 @@ dailyFilledActivity <- data.frame(
   steps = tapply(filledActivity$steps, filledActivity$date, sum, na.rm=TRUE))
 
 qplot(steps, data = dailyFilledActivity)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+
+```r
 mean(dailyFilledActivity$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(dailyFilledActivity$steps)
 ```
 
+```
+## [1] 10766.19
+```
 
-#Differences in activity patterns between weekdays and weekends
+
+## Are there differences in activity patterns between weekdays and weekends?
 
 We close this discussion with a plot showing the difference of activity patterns according to day type.
 
-```{r}
+
+```r
 dayType <- function(x){
   as.factor(ifelse(x %in% c("samedi", "dimanche"), "weekend", "weekday"))}
 filledActivity$dayType <- dayType(weekdays(filledActivity$date))
@@ -146,3 +198,5 @@ for (i in 1:numPlots) {
                                    layout.pos.col = matchidx$col ))}     }
 multiplot(g1,g2)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
